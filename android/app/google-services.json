@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "943463166820",
+    "firebase_url": "https://gpsapkota-app.firebaseio.com",
+    "project_id": "gpsapkota-app",
+    "storage_bucket": "gpsapkota-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:943463166820:android:8decb818ebd13d9098c071",
+        "android_client_info": {
+          "package_name": "com.kalyan.gpsapkota_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "943463166820-ls6ihhl5tu66o9ib5j3g3utd1o2bfsq3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kalyan.gpsapkota_app",
+            "certificate_hash": "c7848afb786f3ecb1e5543261b1c2b9f31300126"
+          }
+        },
+        {
+          "client_id": "943463166820-6vbgnj03q3nt325ssm07bc2o7ilpfim5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8Pxe9nceg4DwoiK_vwz1M6sDMbNFva8Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "943463166820-6vbgnj03q3nt325ssm07bc2o7ilpfim5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
