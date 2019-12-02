@@ -6,6 +6,7 @@ import 'package:gpsapkota_app/screens/users_page/home_page.dart';
 import 'package:gpsapkota_app/widgets/custom_shape.dart';
 import 'package:gpsapkota_app/widgets/responsive_ui.dart';
 import 'package:gpsapkota_app/widgets/textformfield.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'appointment_list.dart';
 
@@ -31,72 +32,89 @@ class _SignInScreenState extends State<SignInScreen> {
   bool _medium;
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-    final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final _formKey = GlobalKey<FormState>();
-
-  // signInWithEmailPassword() async {
-  // final FirebaseAuth _auth = FirebaseAuth.instance;
-  //   FirebaseUser currentUser;
-  //   await _auth
-  //       .signInWithEmailAndPassword(
-  //           email: emailController.text, password: passwordController.text)
-  //       .catchError((error) {
-  //     print('Error is : $error');
-  //   }).then((onValue) {
-  //     currentUser = onValue.user;
-  //     print('$currentUser  logged in');
-  //     print(' user name is ${currentUser.email}');
-  //   });
-  // }
-
+  bool _obscureText = true;
+  var isLoggedIn=null;
   bool isEmail(String em) {
     String p =
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-
     RegExp regExp = new RegExp(p);
-
     return regExp.hasMatch(em);
   }
-
 
   checkAuthentication() async {
     _auth.onAuthStateChanged.listen((user) async {
       if (user != null) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (contect)=>SignInPage(),
-        ));      
-        }
+          builder: (contect) => SignInPage(),
+        ));
+      }
     });
   }
 
   navigateToSignupScreen() {
-  Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (contect)=>SignInPage(),
-        ));    }
+    Navigator.of(context).pushReplacement(MaterialPageRoute(
+      builder: (contect) => SignInPage(),
+    ));
+  }
+  setInSharedPreference()async{
+    final sharedPreferences=await SharedPreferences.getInstance();
+    sharedPreferences.setString('token', '1541541651');
+  }
 
   @override
   void initState() {
     super.initState();
-   // this.checkAuthentication();
+    // this.checkAuthentication();
   }
 
   void signin() async {
     // if (_formKey.currentState.validate()) {
     //   _formKey.currentState.save();
 
-   
-    
-       try {
-        AuthResult user = await _auth.signInWithEmailAndPassword(
-            email: emailController.text, password: passwordController.text);
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (contect)=>HomePage(user:user),
-        ));  
-      } catch (e) {
-        showError(e.message);
-      }
-    
+    try {
+      alertBox();
+      AuthResult user = await _auth.signInWithEmailAndPassword(
+          email: emailController.text, password: passwordController.text);
+         
+      setInSharedPreference( 
+      );    
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (contect) => HomePage(user: user),
+      ));
+    } catch (e) {
+      Navigator.pop(context);
+      showError(e.message);
+    }
+  }
+
+  //Circular indecator
+  alertBox() {
+    return showDialog(
+        context: context,
+        builder: (_) => Center(
+                // Aligns the container to center
+                child: Container(
+              // A simplified version of dialog.
+              width: 100.0,
+              height: 65.0,
+              decoration: BoxDecoration(
+                  borderRadius: new BorderRadius.circular(10.0),
+                  color: Colors.black.withOpacity(0.3)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  CircularProgressIndicator(
+                    backgroundColor: Colors.pinkAccent,
+                    
+                  ),
+                ],
+              ),
+            )));
   }
 
   showError(String errorMessage) {
@@ -125,24 +143,23 @@ class _SignInScreenState extends State<SignInScreen> {
     _pixelRatio = MediaQuery.of(context).devicePixelRatio;
     _large = ResponsiveWidget.isScreenLarge(_width, _pixelRatio);
     _medium = ResponsiveWidget.isScreenMedium(_width, _pixelRatio);
-    return Material(
-      child: Container(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Container(
         height: _height,
         width: _width,
         padding: EdgeInsets.only(bottom: 5),
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              clipShape(),
-              welcomeTextRow(),
-              signInTextRow(),
-              form(),
-              forgetPassTextRow(),
-              SizedBox(height: _height / 12),
-              button(),
-              signUpTextRow(),
-            ],
-          ),
+        child: ListView(
+          children: <Widget>[
+            clipShape(),
+            welcomeTextRow(),
+            signInTextRow(),
+            form(),
+            //forgetPassTextRow(),
+            SizedBox(height: _height / 20),
+            button(),
+            signUpTextRow(),
+          ],
         ),
       ),
     );
@@ -189,12 +206,7 @@ class _SignInScreenState extends State<SignInScreen> {
           margin: EdgeInsets.only(
               top: _large
                   ? _height / 30
-                  : (_medium ? _height / 25 : _height / 20)),
-          // child: Image.asset(
-          //   'assets/images/login.png',
-          //   height: _height/3.5,
-          //   width: _width/3.5,
-          // ),
+                  : (_medium ? _height / 25 : _height / 20))
         ),
       ],
     );
@@ -253,7 +265,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   Widget emailTextFormField() {
     return Material(
-      borderRadius: BorderRadius.circular(30.0),
+      borderRadius: BorderRadius.circular(15.0),
       elevation: 10,
       child: TextFormField(
         validator: (value) {
@@ -271,27 +283,31 @@ class _SignInScreenState extends State<SignInScreen> {
         keyboardType: TextInputType.emailAddress,
         cursorColor: Colors.orange[200],
         decoration: InputDecoration(
-          prefixIcon: Icon(Icons.email, color: Colors.orange[200], size: 20),
-          hintText: "Email ID",
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30.0),
-              borderSide: BorderSide.none),
-        ),
+            prefixIcon: Icon(Icons.email, color: Colors.orange[200], size: 20),
+            hintText: "Email ID",
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30.0),
+                borderSide: BorderSide.none),
+            errorStyle: TextStyle(
+              textBaseline: TextBaseline.alphabetic,
+              decorationStyle: TextDecorationStyle.wavy,
+            )),
       ),
     );
   }
 
   Widget passwordTextFormField() {
     return Material(
-      borderRadius: BorderRadius.circular(30.0),
+      borderRadius: BorderRadius.circular(15.0),
       elevation: 10,
       child: TextFormField(
+        obscureText: _obscureText,
         validator: (value) {
           if (value.isEmpty) {
-            return 'password is empty';
+            return 'Password is empty';
           }
           if (value.length < 8) {
-            return 'password less then 8';
+            return 'Password less then 8';
           }
           return null;
         },
@@ -301,6 +317,19 @@ class _SignInScreenState extends State<SignInScreen> {
         cursorColor: Colors.orange[200],
         decoration: InputDecoration(
           prefixIcon: Icon(Icons.lock, color: Colors.orange[200], size: 20),
+          suffixIcon: GestureDetector(
+            onTap: () {
+              setState(() {
+                _obscureText = !_obscureText;
+              });
+            },
+            child: _obscureText
+                ? Icon(
+                    Icons.visibility,
+                    color: Colors.grey,
+                  )
+                : Icon(Icons.visibility_off, color: Colors.grey),
+          ),
           hintText: "Password",
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
@@ -340,41 +369,26 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
+  //
+
   Widget button() {
-    return RaisedButton(
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
-      // onPressed: () async {
-
-      //   if (_formKey.currentState.validate()) {
-      //     // If the form is valid, display a Snackbar.
-      //     print('all data validate');
-      //     signin();
-      //   }
-      // },
-      onPressed:  () async {
-
-         if (_formKey.currentState.validate()) {
-           _formKey.currentState.save();
-           // If the form is valid, display a Snackbar.
-           print('all data validate');
-           signin();
-         }
-       },
-      textColor: Colors.white,
-      padding: EdgeInsets.all(0.0),
-      child: Container(
-        alignment: Alignment.center,
-        width: _large ? _width / 4 : (_medium ? _width / 2 : _width / 3.5),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(20.0)),
-          gradient: LinearGradient(
-            colors: <Color>[Colors.orange[200], Colors.pinkAccent],
-          ),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 40),
+      child: RaisedButton(
+        color: Colors.pinkAccent,
+        onPressed: () async {
+          if (_formKey.currentState.validate()) {
+            _formKey.currentState.save();
+            // If the form is valid, display a Snackbar.
+            print('all data validate');
+            signin();
+          }
+        },
+        child: Text(
+          'Login',
+          style: TextStyle(
+              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        padding: const EdgeInsets.all(12.0),
-        child: Text('LOGIN',
-            style: TextStyle(fontSize: _large ? 14 : (_medium ? 16 : 10))),
       ),
     );
   }
@@ -396,7 +410,7 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.of(context).push(
+              Navigator.of(context).pushReplacement(
                   MaterialPageRoute(builder: (context) => SignUpScreen()));
               print("Routing to Sign up screen");
             },

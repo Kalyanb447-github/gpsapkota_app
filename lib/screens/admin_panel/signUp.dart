@@ -28,31 +28,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   final _formKey = GlobalKey<FormState>();
     String _name, _email, _password;
-  // signInWithEmailPassword() async {
-  //   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  //   FirebaseUser currentUser;
-  //   await firebaseAuth
-  //       .createUserWithEmailAndPassword(
-  //           email: emailController.text, password: passwordController.text)
-  //       .catchError((error) {
-  //     print('Error is : $error');
-  //   }).then((onValue) {
-  //     currentUser = onValue.user;
-  //     print('new user created');
-  //     print(' user name is ${currentUser.email}');
-  //     Firestore.instance.collection('users').document("${currentUser.uid}").setData({
-  //      'email': currentUser.email,
-  //       'name': currentUser.displayName,
-  //     });
-  //   }).then((currentUser){
-  //     Navigator.of(context).push(MaterialPageRoute(
-  //       builder: (context)=>AppointmentList(
-  //       //  currentUser:currentUser
-  //       ),
-  //     ));
-  //   });
-  // }
 
+   bool _obscureText=true;
+    bool _obscureText2=true;
     bool isEmail(String em) {
 
   String p = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
@@ -82,6 +60,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     signup() async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
+      alertBox();
 
       try {
         AuthResult user = await _auth.createUserWithEmailAndPassword(
@@ -100,6 +79,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
       }
     }
   }
+
+  //alertbox
+  alertBox() {
+    return showDialog(
+        context: context,
+        builder: (_) => Center(
+                // Aligns the container to center
+                child: Container(
+              // A simplified version of dialog.
+              width: 100.0,
+              height: 65.0,
+              decoration: BoxDecoration(
+                  borderRadius: new BorderRadius.circular(10.0),
+                  color: Colors.black.withOpacity(0.3)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  CircularProgressIndicator(
+                    backgroundColor: Colors.blueGrey,
+                  ),
+                                  ],
+              ),
+                         )));
+  }
+  //error
   showError(String errorMessage) {
     showDialog(
         context: context,
@@ -125,24 +131,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _pixelRatio = MediaQuery.of(context).devicePixelRatio;
     _large = ResponsiveWidget.isScreenLarge(_width, _pixelRatio);
     _medium = ResponsiveWidget.isScreenMedium(_width, _pixelRatio);
-    return Material(
-      child: Container(
+     return Scaffold(
+      backgroundColor: Colors.white,
+      body: Container(
         height: _height,
         width: _width,
         padding: EdgeInsets.only(bottom: 5),
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              clipShape(),
-              welcomeTextRow(),
-              signInTextRow(),
-              form(),
-              forgetPassTextRow(),
-              SizedBox(height: _height / 14),
-              button(),
-              signUpTextRow(),
-            ],
-          ),
+        child: ListView(
+          children: <Widget>[
+            clipShape(),
+            welcomeTextRow(),
+            signInTextRow(),
+            form(),
+            //forgetPassTextRow(),
+            SizedBox(height: _height / 20),
+            button(),
+            signUpTextRow(),
+          ],
         ),
       ),
     );
@@ -253,10 +258,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     );
   }
-
   Widget emailTextFormField() {
-     return Material(
-      borderRadius: BorderRadius.circular(30.0),
+    return Material(
+      borderRadius: BorderRadius.circular(15.0),
       elevation: 10,
       child: TextFormField(
         validator: (value) {
@@ -274,27 +278,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
         keyboardType: TextInputType.emailAddress,
         cursorColor: Colors.orange[200],
         decoration: InputDecoration(
-          prefixIcon: Icon(Icons.email, color: Colors.orange[200], size: 20),
-          hintText: "Email ID",
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30.0),
-              borderSide: BorderSide.none),
-        ),
+            prefixIcon: Icon(Icons.email, color: Colors.orange[200], size: 20),
+            hintText: "Email ID",
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30.0),
+                borderSide: BorderSide.none),
+            errorStyle: TextStyle(
+              textBaseline: TextBaseline.alphabetic,
+              decorationStyle: TextDecorationStyle.wavy,
+            )),
       ),
     );
   }
 
-  Widget passwordTextFormField() {
+    Widget passwordTextFormField() {
     return Material(
-      borderRadius: BorderRadius.circular(30.0),
+      borderRadius: BorderRadius.circular(15.0),
       elevation: 10,
       child: TextFormField(
         validator: (value) {
           if (value.isEmpty) {
-            return 'password is empty';
+            return 'Password is empty';
           }
           if (value.length < 8) {
-            return 'password less then 8';
+            return 'Password less then 8';
           }
           return null;
         },
@@ -302,8 +309,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
         controller: passwordController,
         keyboardType: TextInputType.emailAddress,
         cursorColor: Colors.orange[200],
+        obscureText: _obscureText,
         decoration: InputDecoration(
           prefixIcon: Icon(Icons.lock, color: Colors.orange[200], size: 20),
+            suffixIcon: GestureDetector(
+            onTap: (){
+          
+                setState(() {
+                  _obscureText=!_obscureText;
+                });
+              
+            },
+           child:_obscureText?Icon(Icons.visibility,color: Colors.grey,):Icon(Icons.visibility_off,color: Colors.grey),
+          ),
+
           hintText: "Password",
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
@@ -312,11 +331,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     );
   }
-
   Widget conformPasswordTextFormField() {
     return Material(
-      borderRadius: BorderRadius.circular(30.0),
-      elevation: 10,
+  borderRadius: BorderRadius.circular(15.0),
+        elevation: 10,
       child: TextFormField(
         validator: (value) {
           if (value.isEmpty) {
@@ -335,8 +353,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
         controller: conformPasswordController,
         keyboardType: TextInputType.emailAddress,
         cursorColor: Colors.orange[200],
+        obscureText: _obscureText2,
         decoration: InputDecoration(
           prefixIcon: Icon(Icons.lock, color: Colors.orange[200], size: 20),
+                 suffixIcon: GestureDetector(
+            onTap: (){
+          
+                setState(() {
+                  _obscureText2=!_obscureText2;
+                });
+              
+            },
+           child:_obscureText2?Icon(Icons.visibility,color: Colors.grey,):Icon(Icons.visibility_off,color: Colors.grey),
+          ),
           hintText: "Confirm Password",
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
@@ -376,11 +405,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget button() {
-    return RaisedButton(
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
-      onPressed: () async {
+    Widget button() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 40),
+      child: RaisedButton(
+        color: Colors.pinkAccent,
+            onPressed: () async {
        // await signInWithEmailPassword();
         // print("Routing to your account");
         // Scaffold.of(context)
@@ -394,20 +424,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
         // }
         signup();
       },
-      textColor: Colors.white,
-      padding: EdgeInsets.all(0.0),
-      child: Container(
-        alignment: Alignment.center,
-        width: _large ? _width / 4 : (_medium ? _width / 2 : _width / 3.5),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(20.0)),
-          gradient: LinearGradient(
-            colors: <Color>[Colors.orange[200], Colors.pinkAccent],
-          ),
+        child: Text(
+          'Create Account',
+          style: TextStyle(
+              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        padding: const EdgeInsets.all(12.0),
-        child: Text('Create Account',
-            style: TextStyle(fontSize: _large ? 14 : (_medium ? 16 : 10))),
       ),
     );
   }
@@ -430,7 +451,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           GestureDetector(
             onTap: () {
               Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => SignInPage()));
+                  .pushReplacement(MaterialPageRoute(builder: (context) => SignInPage()));
               print("Routing to Sign up screen");
             },
             child: Text(

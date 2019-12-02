@@ -41,18 +41,27 @@ class _SplashScreenState extends State<SplashScreen> {
 
     return Material(
       child: Scaffold(
-        body: Container(
-          height: _height,
-          width: _width,
-          margin: EdgeInsets.only(bottom: 5),
-          child: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                Opacity(opacity: 0.88, child: CustomAppBar()),
-                clipShape(),
 
-                //signInTextRow(),
-              ],
+        
+        body: Container(
+
+          // height: _height,
+          // width: _width,
+          // margin: EdgeInsets.only(bottom: 5),
+          // child: SingleChildScrollView(
+          //   child: Column(
+          //     children: <Widget>[
+          //       Opacity(opacity: 0.88, child: CustomAppBar()),
+          //       clipShape(),
+
+          //       //signInTextRow(),
+          //     ],
+          //   ),
+          // ),
+          decoration: BoxDecoration(
+            image:DecorationImage(
+              fit: BoxFit.cover,
+              image: AssetImage('images/splashdoctor.jpg'),
             ),
           ),
         ),
